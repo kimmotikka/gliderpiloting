@@ -9,3 +9,17 @@ green: 3 - 4 h
 blue: 4 - 5 h
 gray: > 5 h
 ```
+
+## Webserver
+```
+http://<web path>/current_mission.html
+- webpage for the map and data
+-/js
+-- javascript codes
+-/icons
+-- icons and pictures
+-/current
+-- json files with gliderdata
+--- current-path.json
+--- current-path.json
+--- current-AIS.json```
