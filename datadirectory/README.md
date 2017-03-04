@@ -1,4 +1,4 @@
-##Dataserver directory structure:
+## Dataserver directory structure:
 ```
 <gliderfiles root>
 -/src
@@ -16,4 +16,6 @@
 --/from-glider
 --- data files retrieved from the glider
 --/to-glider
---- files to send to the glider```
+--- files to send to the glider
+
+```
