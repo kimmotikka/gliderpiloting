@@ -1,6 +1,6 @@
 
 /*
-function modified from ALUSKARTTA.COM, http://aluskartta.com,  info@maanpuolustus.net
+function from ALUSKARTTA.COM, http://aluskartta.com,  info@maanpuolustus.net
 Copyright © aluskartta.com
 */
 var colors = ['#ff4b00', '#0000ff', '#cc0099', '#55BCBE', '#D2204C', '#33cc33', '#ada59a', '#3e647e', '#e6e600'],
