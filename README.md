@@ -25,7 +25,7 @@ https://github.com/kerfoot/dockserver-mirror
 --/data: data for the 
 --- goto_lxx.ma files of the mission
 --- generated files
-dockserver mirror:
+ (dockserver mirror part:)
 --/logs
 --- glider log files from the dockserver
 --/from-glider
