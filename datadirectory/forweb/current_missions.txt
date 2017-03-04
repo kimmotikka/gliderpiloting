@@ -12,8 +12,8 @@
 # Ahvenanmeri 11/2016:
 #uivelo aland2016 missions/uivelo 2016-11-10 10:00:00
 #
-# Tvarminne-simulation
-s_tvar tvar2017 simulate/s_tvar 2017-02-14 11:55:00
+# Pocket simulation
+s_aland Lagskar2017b simulate/s_aland 2017-02-14 11:55:00
 #
 # on_bench -simulation with Uivelo glider
 #sim_uivelo tvar2017 simulate/sim_uivelo 2017-02-15 14:00:00
