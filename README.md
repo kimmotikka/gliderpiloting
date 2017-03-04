@@ -1,6 +1,8 @@
 # gliderpiloting
 Software to manage glider missions on web 
 
+## Python scripts not added yet!
+
 This project is for manage glider missions and simulations
 
 1) Position of the glider with AIS data layer on web
