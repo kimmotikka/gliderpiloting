@@ -11,8 +11,8 @@ This project is for manage glider missions and simulations
 For retrieving the glider log from the dockserver I used John Kerfoot's dockserver mirroring system:
 https://github.com/kerfoot/dockserver-mirror
 
-Dataserver directory structure:
-
+##Dataserver directory structure:
+'''
 <gliderfiles root>
 -/src
 --- source codes
@@ -30,8 +30,9 @@ dockserver mirror:
 --- data files retrieved from the glider
 --/to-glider
 --- files to send to the glider
-
-Webserver
+'''
+###Webserver
+'''
 <web path>
 - webpage for the map and data
 -/js
@@ -43,3 +44,4 @@ Webserver
 --- current-path.json
 --- current-path.json
 --- current-AIS.json
+'''
