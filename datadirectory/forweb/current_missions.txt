@@ -1,0 +1,21 @@
+# 
+# Active missions (current-missions.txt) 
+# comment rows start with '#', separator 'space'
+# reference <root dir> e.g. /data/gliders (change in python sources)
+# row:
+# <glider name> <mission name> <dockserver mirror root> <startdate> <starttime>
+# example: 
+# uivelo selkameri missions/uivelo 2017-02-12 12:00:00
+#
+# uncomment active missions
+#
+# Ahvenanmeri 11/2016:
+#uivelo aland2016 missions/uivelo 2016-11-10 10:00:00
+#
+# Tvarminne-simulation
+s_tvar tvar2017 simulate/s_tvar 2017-02-14 11:55:00
+#
+# on_bench -simulation with Uivelo glider
+#sim_uivelo tvar2017 simulate/sim_uivelo 2017-02-15 14:00:00
+sim_uivelo Lagskar2017 simulate/sim_uivelo 2017-02-20 15:38:00
+#
