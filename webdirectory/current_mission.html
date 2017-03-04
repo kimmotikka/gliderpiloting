@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<!-- 
+
+This code is for displaying glider missions in (near) realtime with AIS data and navigational chart data from Finnish Traffic Authority's service.
+
+More information on FTAs services and licensing:
+http://www.liikennevirasto.fi/web/en/open-data
+
+Finnish Transport Agency has chosen Creative Commons 4.0 as it's open data license.
+
+
+Kimmo Tikka, kimmo.tikka@fmi.fi
+Finnish Meteorological Institute
+
+ -->
+<html>
+<head>
+	<title>Current missions</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+	<script src="js/leaflet.rotatedMarker.js"></script>
+	<script src="js/shipMarkerIcon.js"></script>
+	<script src="js/latlon.js"></script>
+	<script src="js/addVectorLine.js"></script>
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
+
+ 	<style>
+		#map {
+			width: 85%;
+			height: 75%;
+			position:absolute;
+			float: left;
+            border:1px solid;
+            border-color:black;        /* Green */
+		}
+		#log {
+			overflow-y : scroll;
+			overflow-x : hidden;
+			background-color: white;
+			width: 15%;
+			height:75%;
+			float:right;
+			border: none;
+            /* border:1px solid;
+            border-color:black;        /* Green */
+		}		
+	</style>
+</head>
+<body>
+    <div class="logo">
+        <span>
+            <left><img id="fmi" src="icons/fmi.jpg" alt="Finnish Meteorological Institute" height="51" width="290"></left>
+            <rigth><img id="uivelo" src="icons/uivelo_logo.png" alt="The Uivelo glider" height="51" width="290" style="padding-left:200px"></rigth>
+        </div>
+        <h1>Glider missions in Finland</h1>
+        <h2>Missions and simulations in 2017 of the Slocum glider 'Uivelo'</h2>
+        <span id="currentMission"><b><i>Current: </i></b>Simulations with Uivelo and the pocket simulator</span>
+        <br>
+        <ul>
+        </ul>
+ <div id="maplog"><div id='map'></div>
+<div id="log"><h3></h3><div id="logrows"></div></div>
+</div>
+<script src="current/current-ais.js" type="text/javascript"></script>
+<script src="current/current-paths.js" type="text/javascript"></script>
+<script src="current/current-plans.js" type="text/javascript"></script>
+<script>
+// this script needs some rewriting
+	var pathColor = ["red","green","navy","blue","orange","black"]
+	var iconColor = ["red","orange","yellow","green","blue","gray"]
+    var glNro = 0;
+    var	shipCollNro = 0;
+ 	var gliderPositions = [] 
+ 	var pathNr = paths.length;
+
+ 	var circlesNear = [],
+ 		circlesFar = [];
+
+	for (var i = 0;  i < pathNr; i++){
+		var p = paths[i];
+	    gliderPositions.push({"glider":p["glider"],"mission":p["mission"],"coordinates":{"lat":p["path"][p["path"].length-1][0],"lng":p["path"][p["path"].length-1][1]},"lastTime":p["lastTime"]});
+		var gPos = [gliderPositions[i]["coordinates"]["lat"], gliderPositions[i]["coordinates"]["lng"]];
+		circlesNear.push([{center:gPos, radius:1000, color: 'red',  fillColor:'red', opacity: 0.65, fillOpacity:0.05, weight: 1.0, popup:"1km circle"}, 
+					   {center:gPos, radius:2000, color: 'orange', fillColor:'orange', opacity: 0.65, fillOpacity:0.05, weight: 1.0, popup:"2km circle"},
+					   {center:gPos, radius:3000, color: 'yellow', fillColor:'yellow', opacity: 0.65, fillOpacity:0.05, weight: 1.0, popup:"3km circle"},
+					   {center:gPos, radius:4000, color: 'green', fillColor:'green', opacity: 0.65, fillOpacity:0.05, weight: 1.0, popup:"4km circle"},
+					   {center:gPos, radius:5000, color: 'grey', fillColor:'grey', opacity: 0.65, fillOpacity:0.05, weight: 1.0, popup:"5km circle"}]);
+
+		circlesFar.push([{center:gPos, radius:25000, color: 'red',  fillColor:"none", opacity: 0.65, fillOpacity:0.0, weight: 0.5, popup:"25km circle"}, 
+					   {center:gPos, radius:50000, color: 'orange', fillColor:"none", opacity: 0.65, fillOpacity:0.0, weight: 0.5, popup:"50km circle"},
+					   {center:gPos, radius:75000, color: 'yellow', fillColor:"none", opacity: 0.65, fillOpacity:0.0, weight: 0.5, popup:"75km circle"},
+					   {center:gPos, radius:100000, color: 'green', fillColor:"none", opacity: 0.65, fillOpacity:0.0, weight: 0.5, popup:"100km circle"},
+					   {center:gPos, radius:125000, color: 'green', fillColor:"none", opacity: 0.65, fillOpacity:0.0, weight: 0.5, popup:"100km circle"},
+					   {center:gPos, radius:150000, color: 'green', fillColor:"none", opacity: 0.65, fillOpacity:0.0, weight: 0.5, popup:"100km circle"},
+					   {center:gPos, radius:175000, color: 'green', fillColor:"none", opacity: 0.65, fillOpacity:0.0, weight: 0.5, popup:"100km circle"},
+					   {center:gPos, radius:200000, color: 'black', fillColor:"none", opacity: 0.65, fillOpacity:0.0, weight: 0.5, popup:"125km circle"}]);
+	};
+
+	var numNear = circlesNear[0].length,
+	    numFar = circlesFar[0].length,
+	    reverse = true;
+
+	var glider_position_layer = new L.LayerGroup();
+	var glider_plan_layer = new L.LayerGroup();
+	var AIS_layer = new L.LayerGroup();
+	var sea_lines_layer = new L.LayerGroup();
+	var depth_points_layer = new L.LayerGroup();
+	var openseamap = new L.LayerGroup();
+
+    function gliderMission(layer, mission, lineColor, lineWeight){
+        var gliderLine = L.polyline(mission,
+    	    {
+	        color: lineColor,
+	        weight: lineWeight,
+	        opacity: .7,
+	        //dashArray: '20,15',
+	        lineJoin: 'round'
+        	}).addTo(layer);
+        };
+//
+    var centerFar = 0;
+	for (var r=reverse, i=r?numFar-1:0, n=r?-1:numFar, d=r?-1:1; i!=n; i+=d) {
+		L.circle(circlesFar[centerFar][i].center, circlesFar[centerFar][i].radius, {
+			color: circlesFar[centerFar][i].color,
+			weight: circlesFar[centerFar][i].weight,
+			opacity: circlesFar[centerFar][i].opacity,
+			fillColor: circlesFar[centerFar][i].fillColor,
+			fillOpacity: circlesFar[centerFar][i].fillOpacity
+		}).addTo(glider_position_layer).bindPopup(circlesFar[centerFar][i].popup);
+	}
+//
+	for (var r=reverse, i=r?numNear-1:0, n=r?-1:numNear, d=r?-1:1; i!=n; i+=d) {
+		for (var g = 0; g < pathNr; g++){
+			L.circle(circlesNear[g][i].center, circlesNear[g][i].radius, {
+				color: circlesNear[g][i].color,
+				weight: circlesNear[g][i].weight,
+				opacity: circlesNear[g][i].opacity,
+				fillColor: circlesNear[g][i].fillColor,
+				fillOpacity: circlesNear[g][i].fillOpacity
+			}).addTo(glider_position_layer).bindPopup(circlesNear[g][i].popup);
+		}
+	};
+
+	var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'+
+			'contributors, <a href="http://creativecommons.org/licenses/by-sa/1/">CC-BY-SA</a>, '+
+			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		mNavi = 'http://kartta.liikennevirasto.fi/meriliikenne/dgds/wms_ip/merikartta?service=WMS',
+		mNavAttr = '--- Source: <a href="http://www.liikennevirasto.fi/web/en/open-data">'+
+				   'Finnish Transport Agency.</a> Not for navigational use.'+
+				   ' Does not meet the requirements for official nautical charts ' + 
+				   '<a href="http://creativecommons.org/licenses/by/4.0/">CC 4.0 BY</a>',
+		mOpenSeaAttr = 'OpenSeaMap, not for navigation, licensed by '+
+					'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC SA 2.0</a>';   
+
+	var navchart_layer 	= L.tileLayer.wms(mNavi, {
+					    format: 'image/png',
+					    minZoom: 9, 
+					    transparent: true,
+					    layers: 'cells', 
+					    attribution: mNavAttr
+					});
+
+	var icons = [];
+
+	for (var i = 0;  i < pathColor.length; i++){
+		icons.push(L.icon({
+		iconUrl: 'icons/ship_'+iconColor[i]+'.jpg',
+		iconSize: [8, 15],
+		iconAnchor: [2, 4],
+		popupAnchor: [-3, -6] 
+		}));
+	};
+
+	var distance = function(coord1, coord2){
+		var p1 = new LatLon(coord1[1], coord1[0]);
+		d = 999999.9
+		for (var g = 0; g < coord2.length-1; g++){
+	 		var p2 = new LatLon(coord2[g]["coordinates"]["lat"], coord2[g]["coordinates"]["lng"]);
+			if (p1.distanceTo(p2)/1852 < d){
+				d = p1.distanceTo(p2)/1852;
+			}
+		}
+ 		return d
+	};
+	var shipIcon = icons[1];
+	var getShipIcon = function (feat, crl){
+		var dist = distance(feat.geometry.coordinates, gliderPositions);
+		var distTime = Math.floor(dist/feat.properties.sog);
+		if (distTime > pathColor.length-2){
+			distTime = pathColor.length-1
+		};
+		return icons[distTime];
+	};
+
+    var slocumIcon = L.icon({
+        iconUrl: 'icons/slocum-icon.png',
+        iconSize: [30, 15],
+        iconAnchor: [15, 7],
+        popupAnchor: [-3, -6] 
+        });
+// get metadata of a vessel with <MMSI>
+    function getMMSI(mmsi){
+        var url = "http://meri-test.digitraffic.fi/api/v1/metadata/vessels/"+mmsi;
+        var Httpreq = new XMLHttpRequest(); // a new request
+        Httpreq.open("GET",url,false);
+        Httpreq.send(null);
+        return Httpreq.responseText;          
+    }
+//
+// for each vessel in shipCollection
+    function onEachFeature(feature, layer) {
+        var shipMeta = JSON.parse(getMMSI(feature.mmsi));
+        var popupContent = "<p>"+shipMeta.name+ " (MMSI: " + feature.mmsi +
+                 ")<br>on course (heading): "+feature.properties.cog+" ("+feature.properties.heading+") with speed "+feature.properties.sog+"knots</br>" +' to '+shipMeta.destination;
+
+        if (feature.properties && feature.properties.popupContent) {
+            popupContent += feature.properties.popupContent;
+        }
+        layer.bindPopup(popupContent);
+    }
+//    
+// add ship icons into AIS_layer
+	if (shipCollection.length > 0) {
+		var AISDAta = L.geoJSON([shipCollection[shipCollNro]], {
+			style: function (feature) {
+				return feature.properties && feature.properties.style;
+			},
+
+			onEachFeature: onEachFeature,
+
+			pointToLayer: function (feature, latlng) {
+			    return L.marker(latlng, {
+	                rotationAngle: feature.properties.cog,
+	                draggable: true, 
+	                icon: getShipIcon(feature, circlesNear)
+	            })}, 
+
+		}).addTo(AIS_layer);
+    };
+//
+// OpenSeaMap, not for navigation, licensed by CC 2.0
+	var openSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', 
+								{minZoom: 7, 
+								 attribution: mOpenSeaAttr
+								}).addTo(openseamap);
+//
+// sea lanes from the Finnish Trafic Agency's service
+	var sea_lines = L.tileLayer.wms('https://extranet.liikennevirasto.fi/inspirepalvelu/avoin/wms', {
+    	layers: 'vaylat,vaylaalueet',
+    	transparent: true,
+    	format: 'image/png',
+    	maxZoom: 18,
+    	minZoom: 7,
+    	attribution: mNavAttr
+	}).addTo(sea_lines_layer);
+//
+// planned glider paths	
+	if (plans.length > 0){
+		var glider_plan_layers = L.polyline(plans[glNro]["plan"], {"weight":1, "color":'yellow'}).addTo(glider_plan_layer);};
+		for (var i = 0;  i < gliderPositions.length; i++){
+		    var g = gliderPositions[i];
+		    var gliderOnLayer = L.marker(g["coordinates"], {
+                                draggable: true, 
+                                icon: slocumIcon})
+                        .addTo(glider_position_layer)
+                        .bindPopup(g["glider"])
+                        .openPopup();
+          };
+
+	for (var i = 0;  i < pathNr; i++){
+		 var p = paths[i];
+	     		L.polyline(p["path"], {"weight":4, "color":pathColor[i]}).addTo(glider_position_layer);
+	 	  };
+//
+// depth points from the Finnish Trafic Agency's service, Baltic Sea Area
+	var depth_points = 
+		L.tileLayer.wms('https://extranet.liikennevirasto.fi/inspirepalvelu/rajoitettu/wms', {
+        	layers: 'syvyyspiste_p',
+        	transparent: true,
+        	format: 'image/png',
+        	maxZoom: 18,
+        	minZoom: 13,
+        	attribution: mNavAttr,
+    	}).addTo(depth_points_layer);
+
+    mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+
+	var map = L.map('map', {
+		center: [gliderPositions[0]["coordinates"]["lat"], gliderPositions[0]["coordinates"]["lng"]],
+		zoom: 8,
+		layers: [glider_position_layer, glider_plan_layer, 
+				//grayscale, 
+				AIS_layer, //vektorit, 
+				navchart_layer, sea_lines_layer, depth_points_layer, openseamap]
+	});
+
+    var streets  	= L.tileLayer(
+        'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //attribution: '&copy; ' + mapLink + ' Contributors',
+        maxZoom: 18,
+        }).addTo(map);
+
+	var baseLayers = {
+		//"Grayscale": grayscale,
+		"Streets": streets
+	};
+	var  overlays = {
+		"Glider": glider_position_layer,
+		"Mission plan": glider_plan_layer,
+		"AIS": AIS_layer,
+		//"Suunta": vektorit,
+		"Nav chart": navchart_layer,
+		"Sea lines": sea_lines_layer,
+		"Depth points": depth_points_layer,
+		"OpenSeaMap": openseamap
+	};
+
+	L.control.layers(baseLayers, overlays).addTo(map);
+</script>
+</body>
+</html>
+
