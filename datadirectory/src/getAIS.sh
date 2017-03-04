@@ -1,4 +1,8 @@
 #!/bin/sh
+# put this script in crontab
+# e.g. 
+# */10 * * * * sh getAIS.sh
+#
 rootdir=/data/gliders
 sourcedir=$rootdir/src
 webdir=$rootdir/forweb
