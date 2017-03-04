@@ -1,0 +1,2 @@
+curl -s -X GET --header 'Accept: application/json' 'http://meri-test.digitraffic.fi/api/v1/locations/latitude/59.91/longitude/19.8518/radius/100/from/2017-02-20T18:07:29.952185Z' > /data/glider/simulate/sim_uivelo/data/sim_uivelo_Lagskar2017_ais.json
+curl -s -X GET --header 'Accept: application/json' 'http://meri-test.digitraffic.fi/api/v1/locations/latitude/59.7697/longitude/19.948/radius/100/from/2017-02-20T18:07:29.952185Z' > /data/glider/simulate/s_aland/data/s_aland_Lagskar2017_ais.json
