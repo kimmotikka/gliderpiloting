@@ -7,7 +7,7 @@ rootdir=/data/gliders
 sourcedir=$rootdir/src
 webdir=$rootdir/forweb
 cd $sourcedir
-<pythonpath>/python -c "import read_gliderlog as rg; rg.writeCurrentMissionData('$rootdir');"
+<pythonpath>/python -c "import readGliderLog as rg; rg.writeCurrentMissionData('$rootdir');"
 #
 echo "delete old sh:n"
 rm -f $webdir/aisQ.sh
