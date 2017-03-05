@@ -1,8 +1,6 @@
 # gliderpiloting
 Software to manage glider missions on web 
 
-## Python scripts not added yet!
-
 This project is for manage glider missions and simulations
 
 1) Position of the glider with AIS data layer on web
@@ -12,6 +10,8 @@ This project is for manage glider missions and simulations
 
 For retrieving the glider log from the dockserver I used John Kerfoot's dockserver mirroring system:
 https://github.com/kerfoot/dockserver-mirror
+
+Scripts still in beta state, be free to modify!
 
 ###Dataserver directory structure:
 ```
@@ -43,7 +43,7 @@ https://github.com/kerfoot/dockserver-mirror
 -- icons and pictures
 -/current
 -- json files with gliderdata
---- current-path.json
---- current-path.json
+--- current-plans.json
+--- current-paths.json
 --- current-AIS.json
 ```
