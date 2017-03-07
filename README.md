@@ -11,9 +11,9 @@ This project is for manage glider missions and simulations
 For retrieving the glider log from the dockserver I used John Kerfoot's dockserver mirroring system:
 https://github.com/kerfoot/dockserver-mirror
 
-Scripts still in beta state, be free to modify!
+**Scripts still in beta state, be free to modify!**
 
-###Dataserver directory structure:
+### Dataserver directory structure:
 ```
 <gliderfiles root>
 -/src
